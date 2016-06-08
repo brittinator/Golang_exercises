@@ -20,10 +20,20 @@ func toString(nums...int) string {
   //needs explicit return
   string := ""
 
-  for i := 0; i < len(nums); i++ {
-    // Itoa = converts int to string
-    // Atoi = converts string to int
-    n := strconv.Itoa(nums[i])
+  // for i := 0; i < len(nums); i++ {
+  //   // Itoa = converts int to string
+  //   // Atoi = converts string to int
+  //   n := strconv.Itoa(nums[i])
+  //   string += n
+  //   if i != len(nums) - 1 {
+  //     string += "+"
+  //   } else {
+  //     string += "="
+  //   }
+  // }
+  // another way to iterate through whole array
+  for i, num := range nums {
+    n := strconv.Itoa(num)
     string += n
     if i != len(nums) - 1 {
       string += "+"
@@ -31,6 +41,7 @@ func toString(nums...int) string {
       string += "="
     }
   }
+  //range iterate over an array, slice, string, map, or channel.
   return string
 }
 
