@@ -24,4 +24,7 @@ func main() {
   fmt.Println(myNextInt())
   fmt.Println(myNextInt())
 
+  initialized := intSeq()
+  fmt.Println(initialized())
+
 }
