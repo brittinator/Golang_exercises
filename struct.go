@@ -31,7 +31,7 @@ func main(){
   fmt.Println("House ", hp.house)
 
   // to reassign things, need to get the pointer for the object first
-  trPointer := &tr
+  trPointer := &tr //& prefix gets you the pointer to the struct
   trPointer.name = "Voldemort"
   trPointer.good = false
 
