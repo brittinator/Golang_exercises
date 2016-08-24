@@ -43,7 +43,15 @@ func write(path string) {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		create(path)
 	}
-	fmt.Print(toWrite)
+	file, err := os.OpenFile(path, os.O_APPEND|os.O_RDWR, 0644)
+	// err := ioutil.WriteFile(path, toWrite, 0644)
+	check(err)
+	defer file.Close()
+
+	_, err = file.WriteString(toWrite)
+	check(err)
+
+	fmt.Printf("Wrote %s to %s", toWrite, path)
 }
 
 func check(e error) {
