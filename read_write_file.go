@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"strings"
 )
@@ -14,24 +15,12 @@ func create(path string) {
 }
 
 func read(path string) {
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("What do you want to write: ")
-	toWrite, _ := reader.ReadString('\n')
-	fmt.Print("Do you want to append the file's content? Press \n 1 for yes \n 2 for no")
-	append, _ := reader.ReadString('\n')
-	if strings.TrimSpace(append) == "1" {
-		f, err := os.OpenFile(path, os.O_APPEND|os.O_RDWR, 0644)
-		check(err)
-		_, err = f.WriteString(toWrite)
-
-		defer f.Close()
-	} else {
-		f, err := os.OpenFile(path, os.O_RDWR, 0644)
-		check(err)
-
-		defer f.Close()
-
-	}
+	file, err := ioutil.ReadFile(path)
+	check(err)
+	// print the bytes of the file
+	fmt.Print(file)
+	// print the content as a string
+	fmt.Println(string(file))
 }
 
 func write(path string) {
