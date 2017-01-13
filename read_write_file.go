@@ -51,7 +51,7 @@ func check(e error) {
 }
 
 func main() {
-	fmt.Print("What is the filepath?")
+	fmt.Print("What is the absolute filepath?")
 	reader := bufio.NewReader(os.Stdin)
 	path, _ := reader.ReadString('\n')
 	path = strings.TrimSpace(path)
