@@ -30,6 +30,6 @@ func main() {
 		}
 	}
 	hello := "hello"
-	unsafe.Sizeof(hello)
+	fmt.Println(unsafe.Sizeof(hello)) // 8
 
 }

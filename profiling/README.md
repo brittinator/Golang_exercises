@@ -1,122 +1,135 @@
-# Benchmarking and Profiling in GO
-
-## Code profiling, flame graphs, memory usage
+# Benchmarking and Profiling in GO: Code profiling, flame graphs, memory usage
 
 I leaned heavily of a few blog articles, mainly this one: https://blog.golang.org/profiling-go-programs
 
-**Requirements and dependencies**
+### Requirements and dependencies for
+
+**pprof**
 * install go and go-tools if you haven’t already
 https://golang.org/doc/install
 
+**graphs**
 * to create graphical svgs with either pprof or go-torch, install graphviz:http://www.graphviz.org/
-  `brew install graphviz`
 
+      `brew install graphviz`
+
+**flamegraphs**
 * also to use go-torch, it requires brendanGregg’s flamegraph in the GOPATH (I dropped it right in the repo)
   * FlameGraph: https://github.com/brendangregg/FlameGraph
-git@github.com:brendangregg/FlameGraph.git
+         git@github.com:brendangregg/FlameGraph.git
   * go-torch: https://github.com/uber/go-torch
-    git@github.com:uber/go-torch.git
-go-torch binaryname cpu.prof
+        git@github.com:uber/go-torch.git
+
+to create flamegraph: `go-torch binaryname cpu.prof`
 
 
-**Running**
+## Running
 
 There are multiple ways to run `pprof` on your code, either via `go-test`, as a command-line input straight in the code, or via the http/server listen.
 
-### Via Command-line
+### Method a: Via Command-line
 `import 	"runtime/pprof"`
-create flags to pass in if want to run pprof
-note: if you run different types of profiling they could interact with each other to give false numbers
 
-```var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
-var memprofile = flag.String("memprofile", "", "write mem profile to file")
+* create flags to pass in if want to run pprof
 
-if c.CPUPROFILE != "" {
-		f, err := os.Create(c.CPUPROFILE)
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Println("starting StartCPUProfile")
-		pprof.StartCPUProfile(f)
-		defer pprof.StopCPUProfile()
-	}
+**note**: if you run different types of profiling they could interact with each other and give false numbers
 
-if c.MEMPROFILE != "" {
-		f, err := os.Create(c.MEMPROFILE)
-		if err != nil {
-			log.Fatal("could not create memory profile: ", err)
-		}
-		runtime.GC() // get up-to-date statistics
-		fmt.Println("starting WriteHeapProfile")
-		if err := pprof.WriteHeapProfile(f); err != nil {
-			log.Fatal("could not write memory profile: ", err)
-		}
-		f.Close()
-	}```
+        var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
+        var memprofile = flag.String("memprofile", "", "write mem profile to file")
 
-compile binary
-`$ go build main.go`
-run binary with command-line flags for profile that you want
-`$ ./main --cpuprofile=cpu.prof`
-`$ ./main --memprofile=mem.prof`
+        if c.CPUPROFILE != "" {
+                f, err := os.Create(c.CPUPROFILE)
+                if err != nil {
+                    log.Fatal(err)
+                }
+                fmt.Println("starting StartCPUProfile")
+                pprof.StartCPUProfile(f)
+                defer pprof.StopCPUProfile()
+            }
 
-Now that you've created the profiling file, it's time to look at it in pprof.
+        if c.MEMPROFILE != "" {
+                f, err := os.Create(c.MEMPROFILE)
+                if err != nil {
+                    log.Fatal("could not create memory profile: ", err)
+                }
+                runtime.GC() // get up-to-date statistics
+                fmt.Println("starting WriteHeapProfile")
+                if err := pprof.WriteHeapProfile(f); err != nil {
+                    log.Fatal("could not write memory profile: ", err)
+                }
+                f.Close()
+            }
 
-### To Use pprof
-`$ go tool pprof binaryname profilename` aka `$go tool pprof main cpu.prof`
-Once inside pprof, can look at the topN items on the cpu (or memory usage) with
-`top10`
-sort by the 4th and 5th columns with `-cum` `top20 -cum`
-You can create an svg file with calls in boxes and their callers with `web`
-To view the source code for a particular call use `list` ie `list myawesomefunction`
+* compile binary `$ go build main.go`
 
-### Via testing framework
-or can run benchmarking with go test
+* run binary with command-line flags for profile that you want
+        $ ./main --cpuprofile=cpu.prof
+        $ ./main --memprofile=mem.prof
 
-```
-import "testing"
+* Now that you've created the profiling file, it's time to look at it in pprof.
 
-func BenchmarkMyFunction(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-    myfunction(5)
-  }
-} ```
+### To Use PPROF
+`$ go tool pprof binaryname profilename` aka `$go tool pprof main cpu.prof`  
+`top10` to look  topN items on the cpu or memory usage   
+`-cum` to sort by the 4th and 5th columns with, ie `top20 -cum`  
+`web` to create svg file that contains the system calls in boxes and their callers  
+`list` To view the source code for a particular call use ie `list myawesomefunction`  
+
+### Method b: Via testing framework
+
+* Inside your `main_test.go` file  
+
+
+    import "testing"
+
+    func BenchmarkMyFunction(b *testing.B) {
+    	for i := 0; i < b.N; i++ {
+        myfunction(5)
+      }
+    }
 
 
 then run
-`go test -run FFF -bench Bench -memprofile mem2.prof --memprofilerate 1`
-FFF is to regex match no tests to run, so it just executes the benchmarking
-memprofilerate will grab all memory instead of just a sampling
+`go test -run FFF -bench Bench -memprofile mem2.prof --memprofilerate 1`  
+`FFF` is to regex match no tests to run, so it just executes the benchmarking  
+`memprofilerate` will grab all memory instead of just a sampling  
 
 
-### Via http/pprof
+### Method c: Via http/pprof
 * For use with currently running binaries, when perhaps there is a rampup in cpu or memory consumption that one wants to skip.
 
-`import _ "net/http/pprof"`
 
-```go func() {
-	log.Println(http.ListenAndServe("localhost:6060", nil))
-}()```
+    import _ "net/http/pprof"
 
-compile and run as usual
-then on browser go to
+    go func() {
+    	log.Println(http.ListenAndServe("localhost:6060", nil))
+    }()
+
+
+* compile and run as usual
+* then on browser go to
  http://localhost:6060/debug/pprof/heap or  http://localhost:6060/debug/pprof or  http://localhost:6060/debug/pprof/profile (can also use curl if no broswer access)
 
 ### Miscellaneous
 
-* Can also use runtime.Memstats https://golang.org/pkg/runtime/#MemStats to get memory information
+* Can also use `runtime.Memstats`  to get memory information  
+https://golang.org/pkg/runtime/#MemStats
 
 plop this inside function of interest
-```
-	var mem runtime.MemStats
-	runtime.ReadMemStats(&mem)
-	log.Printf("mem.TotalAlloc: %v\n", mem.TotalAlloc)
-	log.Printf("mem.HeapAlloc: %v\n", mem.HeapAlloc)
-	log.Printf("mem.HeapSys: %v\n", mem.HeapSys)
-```
 
-* To get memory size of a variable, use `unsafe.Sizeof(variablename)` with a prints statement
-* To get type of a variable, use %T in a print statement like so `fmt.Printf("%T", hello)  -> returns string`
+
+    	var mem runtime.MemStats
+    	runtime.ReadMemStats(&mem)
+    	log.Printf("mem.TotalAlloc: %v\n", mem.TotalAlloc)
+    	log.Printf("mem.HeapAlloc: %v\n", mem.HeapAlloc)
+    	log.Printf("mem.HeapSys: %v\n", mem.HeapSys)
+
+
+* To get memory size of a variable, use
+    `unsafe.Sizeof(variablename)` with a prints statement  
+    `fmt.Println(unsafe.Sizeof(hello))`  // _8_  
+* To get type of a variable, use %T in a print statement like so  
+    fmt.Printf("%T", hello)  //  _string_  
 
 
 Full list of pprof commands
