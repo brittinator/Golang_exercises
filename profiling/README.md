@@ -69,15 +69,15 @@ There are multiple ways to run `pprof` on your code, either via `go-test`, as a 
 * Now that you've created the profiling file, it's time to look at it in pprof.
 
 ### To Use PPROF
-`$ go tool pprof binaryname profilename` aka `$go tool pprof main cpu.prof`  
-`top10` to look  topN items on the cpu or memory usage   
-`-cum` to sort by the 4th and 5th columns with, ie `top20 -cum`  
-`web` to create svg file that contains the system calls in boxes and their callers  
-`list` To view the source code for a particular call use ie `list myawesomefunction`  
+`$ go tool pprof binaryname profilename` aka `$go tool pprof main cpu.prof`
+`top10` to look  topN items on the cpu or memory usage
+`-cum` to sort by the 4th and 5th columns with, ie `top20 -cum`
+`web` to create svg file that contains the system calls in boxes and their callers
+`list` To view the source code for a particular call use ie `list myawesomefunction`
 
 ### Method b: Via testing framework
 
-* Inside your `main_test.go` file  
+* Inside your `main_test.go` file
 
 
     import "testing"
@@ -90,9 +90,9 @@ There are multiple ways to run `pprof` on your code, either via `go-test`, as a 
 
 
 then run
-`go test -run FFF -bench Bench -memprofile mem2.prof --memprofilerate 1`  
-`FFF` is to regex match no tests to run, so it just executes the benchmarking  
-`memprofilerate` will grab all memory instead of just a sampling  
+`go test -run FFF -bench Bench -memprofile mem2.prof --memprofilerate 1`
+`FFF` is to regex match no tests to run, so it just executes the benchmarking
+`memprofilerate` will grab all memory instead of just a sampling
 
 
 ### Method c: Via http/pprof
@@ -112,7 +112,7 @@ then run
 
 ### Miscellaneous
 
-* Can also use `runtime.Memstats`  to get memory information  
+* Can also use `runtime.Memstats`  to get memory information
 https://golang.org/pkg/runtime/#MemStats
 
 plop this inside function of interest
@@ -126,10 +126,10 @@ plop this inside function of interest
 
 
 * To get memory size of a variable, use
-    `unsafe.Sizeof(variablename)` with a prints statement  
-    `fmt.Println(unsafe.Sizeof(hello))`  // _8_  
-* To get type of a variable, use %T in a print statement like so  
-    fmt.Printf("%T", hello)  //  _string_  
+    `unsafe.Sizeof(variablename)` with a prints statement
+    `fmt.Println(unsafe.Sizeof(hello))`  // _8_
+* To get type of a variable, use %T in a print statement like so
+    fmt.Printf("%T", hello)  //  _string_
 
 
 Full list of pprof commands
@@ -225,4 +225,4 @@ Entering interactive mode (type "help" for commands)
             mean_delay
             contentions
 
-   :   Clear focus/ignore/hide/tagfocus/tagignore```
+   :   Clear focus/ignore/hide/tagfocus/tagignore
