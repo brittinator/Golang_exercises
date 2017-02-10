@@ -19,7 +19,8 @@ func handleConn(c net.Conn) {
 	defer c.Close()
 	// infinite loop
 	for {
-		if _, err := io.WriteString(c, time.Now().Format("15:03:05\n")); err != nil {
+		_, err := io.WriteString(c, time.Now().Format("15:03:05\n"))
+		if err != nil {
 			// this means the client disconnected
 			return
 		}
