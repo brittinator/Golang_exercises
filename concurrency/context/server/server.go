@@ -1,6 +1,8 @@
+/*Server a randomly slow/fast server. It is used by the
+worker program.
+*/
 package main
 
-// This a randomly slow/fast server
 import (
 	"fmt"
 	"math/rand"
