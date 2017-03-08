@@ -1,6 +1,7 @@
 # Benchmarking and Profiling in GO: Code profiling, flame graphs, memory usage
 
 I leaned heavily of a few blog articles, mainly this one: https://blog.golang.org/profiling-go-programs
+This is also a great talk by Prashant on Profiling and Optimizing Go: https://www.youtube.com/watch?v=N3PWzBeLX2M
 
 ### Requirements and dependencies for
 
